@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fractional Knapsack Calculator</title>
+  <style>
+    /* Global Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #ff5329, #df522b);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
+      width: 400px;
+      max-width: 90%;
+      padding: 25px 20px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.8rem;
+      color: #444;
+      margin-bottom: 15px;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #555;
+      margin-bottom: 8px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px 15px;
+      font-size: 0.9rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    input:focus, textarea:focus {
+      border-color: orangered;
+      box-shadow: 0 0 5px rgba(255, 111, 97, 0.3);
+    }
+
+    textarea {
+      resize: none;
+      height: 80px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: orangered;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #e35d55;
+    }
+
+    .output {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f9f9f9;
+      border-left: 4px solid #ff6f61;
+      border-radius: 8px;
+      font-size: 1rem;
+      color: #444;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Fractional Knapsack</h1>
+
+    <div class="input-group">
+      <label for="capacity">Knapsack Capacity:</label>
+      <input type="number" id="capacity" placeholder="Enter capacity (e.g., 50)" />
+    </div>
+
+    <div class="input-group">
+      <label for="itemCount">Number of Items:</label>
+      <input type="number" id="itemCount" placeholder="Enter number of items (e.g., 3)" />
+    </div>
+
+    <div class="input-group">
+      <label for="items">Items (profit, weight):</label>
+      <textarea id="items" placeholder="Example: 60 10, 100 20, 120 30"></textarea>
+    </div>
+
+    <button onclick="solveKnapsack()">Calculate Maximum Profit</button>
+
+    <div id="output" class="output" style="display: none;"></div>
+  </div>
+
+  <script>
+    // Function to calculate the maximum profit
+    function fractionalKnapsack(capacity, items) {
+      // Sort items based on profit-to-weight ratio
+      items.sort((a, b) => (b.profit / b.weight) - (a.profit / a.weight));
+
+      let totalValue = 0; // Total profit
+
+      for (let i = 0; i < items.length; i++) {
+        if (capacity >= items[i].weight) {
+          // Take the full item
+          capacity -= items[i].weight;
+          totalValue += items[i].profit;
+        } else {
+          // Take a fraction of the item
+          totalValue += items[i].profit * (capacity / items[i].weight);
+          break;
+        }
+      }
+
+      return totalValue;
+    }
+
+    // Function to handle user input and solve the problem
+    function solveKnapsack() {
+      const capacity = parseFloat(document.getElementById("capacity").value);
+      const itemCount = parseInt(document.getElementById("itemCount").value);
+      const itemsInput = document.getElementById("items").value;
+
+      const outputDiv = document.getElementById("output");
+
+      if (isNaN(capacity) || isNaN(itemCount) || !itemsInput) {
+        outputDiv.innerText = "Please provide valid input!";
+        outputDiv.style.display = "block";
+        return;
+      }
+
+      const items = itemsInput.split(",").map(item => {
+        const [profit, weight] = item.trim().split(" ").map(Number);
+        return { profit, weight };
+      });
+
+      if (items.length !== itemCount) {
+        outputDiv.innerText = "Item count does not match the number of items provided!";
+        outputDiv.style.display = "block";
+        return;
+      }
+
+      const maxProfit = fractionalKnapsack(capacity, items);
+
+      outputDiv.innerText = `Maximum profit in the knapsack: ${maxProfit.toFixed(2)}`;
+      outputDiv.style.display = "block";
+    }
+  </script>
+</body>
+</html>
